@@ -1,0 +1,15 @@
+apiVersion: skaffold/v2beta26
+kind: Config
+metadata:
+  name: jigaree
+build:
+  artifacts:
+  - image: us-central1-docker.pkg.dev/play-with-anthos-340801/jigaree/maker
+    context: src/maker
+    buildpacks:
+      builder: gcr.io/buildpacks/builder:v1
+deploy:
+  kubectl:
+    manifests:
+    - k8s-manifests/redis/deployment.yaml
+    - k8s-manifests/redis/svc.yaml

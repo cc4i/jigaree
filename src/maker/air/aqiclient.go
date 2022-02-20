@@ -12,11 +12,12 @@ import (
 	"strconv"
 	"strings"
 
+	log "maker/logging"
+
 	"github.com/sirupsen/logrus"
 )
 
 var (
-	log                = logrus.New()
 	Client             HttpClient
 	AQIServer          string // "https://api.waqi.info"
 	AQIServerToken     string // "b0e78ca32d058a9170b6907c5214c0e946534cc9"
@@ -124,11 +125,15 @@ func init() {
 	AQIServerToken = os.Getenv("AQI_SERVER_TOKEN")
 	IpStackServer = os.Getenv("IP_STACK_SERVER_URL")
 	IpStackServerToken = os.Getenv("IP_STACK_SERVER_TOKEN")
-	if AQIServer == "" || IpStackServer == "" {
-		log.Fatal("Retrieving servers' address were failed. Check out environments setting & Reboot.")
-	}
-	if AQIServerToken == "" || IpStackServerToken == "" {
-		log.Fatal("Retrieving servers' token were failed. Check out environments setting & Reboot.")
+	if AQIServer == "" || IpStackServer == "" || AQIServerToken == "" || IpStackServerToken == "" {
+		log.Lx.Fatal("Retrieving servers' address were failed. Check out environments setting & Reboot.")
+		log.Lx.WithFields(logrus.Fields{
+			"AQI_SERVER_URL":        AQIServer,
+			"AQI_SERVER_TOKEN":      AQIServerToken,
+			"IP_STACK_SERVER_URL":   IpStackServer,
+			"IP_STACK_SERVER_TOKEN": IpStackServer,
+		}).Error("Failed to initail environments setting, pls configure & Reboot.")
+
 	}
 
 	// Initial http client
@@ -143,7 +148,10 @@ func init() {
 func SplitName(name string) (city string, citycn string) {
 	ns := strings.Split(name, "(")
 	if len(ns) != 2 {
-		log.Println("Input name <", name, "> wasn't matched with convention. eg: ", "Beijing (北京)")
+		log.Lx.WithFields(logrus.Fields{
+			"name": name,
+		}).Error("Input name wasn't matched with convention. eg: ", "Beijing (北京)")
+
 		return name, ""
 	}
 	city = strings.Trim(ns[0], " ")
@@ -188,25 +196,39 @@ func Copy2AirQuality(src OriginAirQuality) AirQuality {
 
 func HttpGet(ctx context.Context, url string) ([]byte, error) {
 
-	log.Infof("request_to: %s", url)
+	log.Lx.WithFields(logrus.Fields{
+		"url": url,
+	}).Info("request to")
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Errorf("http.NewRequest was failed from %s with Err: %s.", url, err)
+		log.Lx.WithFields(logrus.Fields{
+			"url":   url,
+			"error": err,
+		}).Error("Http.NewRequest() was failed")
 		return nil, err
 	}
 	resp, err := Client.Do(req)
 	if err != nil {
-		log.Errorf("API call was failed from %s with Err: %s.", url, err)
+		log.Lx.WithFields(logrus.Fields{
+			"url":   url,
+			"error": err,
+		}).Error("Client.Do() was failed")
 		return nil, err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Errorf("Read buffer failed with Err: %s", err)
+		log.Lx.WithFields(logrus.Fields{
+			"url":   url,
+			"error": err,
+		}).Error("Failed to read buffer")
 		return nil, err
 	}
-	log.Infof("response_from: %s, result: %s", url, string(body))
 
+	log.Lx.WithFields(logrus.Fields{
+		"url":  url,
+		"byte": body,
+	}).Debug("response from http server")
 	return body, nil
 }
 
@@ -216,27 +238,13 @@ func CityByIP(ctx context.Context, ip string) (string, error) {
 	url := IpStackServer + "/" + ip + "?access_key=" + IpStackServerToken
 	buf, err := HttpGet(ctx, url)
 	if err != nil {
-		log.Error(err)
 		return "", err
+	} else {
+		err = json.Unmarshal(buf, &ipStack)
 	}
-	if err = json.Unmarshal(buf, &ipStack); err != nil {
-		log.Error(err)
-		return "", err
-	}
-	return ipStack.City, nil
 
-}
+	return ipStack.City, err
 
-func AirbyCity(ctx context.Context, city string) (AirQuality, error) {
-
-	url := AQIServer + "/feed/" + city + "/?token=" + AQIServerToken
-	log.Info("AQI Service: %s", url)
-	buf, err := HttpGet(ctx, url)
-	if err != nil {
-		log.Errorf("Fail to call AQIServer service from %s", url)
-		return AirQuality{}, err
-	}
-	return convertAir(buf)
 }
 
 func convertAir(content []byte) (AirQuality, error) {
@@ -245,16 +253,12 @@ func convertAir(content []byte) (AirQuality, error) {
 	var apiError ApiError
 
 	err := json.Unmarshal(content, &originAir)
-	if err != nil {
-		log.Println(err)
-		return newAir, err
-	}
+
 	if originAir.Status == "error" {
 		err = json.Unmarshal(content, &apiError)
-		if err != nil {
-			log.Println(err)
-		}
-		log.Printf("Convert data was failed due to <%s>. ", apiError.Data)
+		log.Lx.WithFields(logrus.Fields{
+			"error": apiError,
+		}).Error("return error from AQI service")
 		return newAir, err
 
 	}
@@ -262,4 +266,22 @@ func convertAir(content []byte) (AirQuality, error) {
 
 	return newAir, nil
 
+}
+
+func AirbyCity(ctx context.Context, city string) (AirQuality, error) {
+
+	url := AQIServer + "/feed/" + city + "/?token=" + AQIServerToken
+	log.Lx.WithFields(logrus.Fields{
+		"url": url,
+	}).Info("request to AQI service")
+	buf, err := HttpGet(ctx, url)
+	if err != nil {
+		return AirQuality{}, err
+	}
+	air, err := convertAir(buf)
+	log.Lx.WithFields(logrus.Fields{
+		"url": url,
+		"air": air,
+	}).Info("curated response from AQI service")
+	return air, err
 }

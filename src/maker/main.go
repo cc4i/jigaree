@@ -6,17 +6,13 @@ package main
 import (
 	"context"
 	"maker/air"
+	"maker/gen"
+	log "maker/logging"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sirupsen/logrus"
 )
-
-// log := logrus.New()
-// log.SetFormatter(&log.JSONFormatter{})
-// gin.DefaultWriter = log.Out
-var log = logrus.New()
 
 // Configurue routes
 func router(ctx context.Context, r *gin.Engine) *gin.Engine {
@@ -31,6 +27,10 @@ func router(ctx context.Context, r *gin.Engine) *gin.Engine {
 
 func aqByCity(c *gin.Context) {
 	city := c.Param("city")
+	if city == "_r" {
+		c.JSON(http.StatusOK, gen.RandomAQ())
+		return
+	}
 	bj, err := air.AirbyCity(c.Request.Context(), city)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, bj)
@@ -106,6 +106,7 @@ func readme(c *gin.Context) {
 // main
 func main() {
 	gin.DisableConsoleColor()
-	r := gin.Default()
-	log.Fatal(router(context.Background(), r).Run("0.0.0.0:9011"))
+	server := gin.Default()
+	server.Use(log.Logger_JSON())
+	log.Lx.Fatal(router(context.Background(), server).Run("0.0.0.0:9011"))
 }
