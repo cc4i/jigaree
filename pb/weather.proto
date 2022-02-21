@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package weather;
+
+// Interface exported by Weather Server.
+service WeatherService {
+    // Retrieve air qualiy by city.
+    rpc AirQualitybyCity(string) returns (CityAirQuality) {}
+
+    // Retrieve air quality by IP, where IP is belonging to.
+    rpc AirQualitybyIP(string) returns (CityAirQuality) {}
+}
+
+// The air quality data for city.
+message CityAirQuality {
+
+    // The name of city
+    string city = 1;
+
+    string co = 2;
+	string h = 3;
+	string no2 = 4;
+	string o3 = 5;
+	string p = 6;
+	string pm10 = 7;
+	string pm25 = 8;
+	string so2 = 9;
+
+    // Latitude
+    string lat = 10;
+    // Longitude
+	string lgt = 11;
+}
