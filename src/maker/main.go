@@ -5,10 +5,13 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
 	"maker/air"
 	"maker/gen"
-	log "maker/logging"
+	"maker/log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -52,61 +55,39 @@ func metrics(c *gin.Context) {
 
 // Readme for air quality standard
 func readme(c *gin.Context) {
+	c.JSON(http.StatusOK, air.Readme())
+}
 
-	// Get AQIServer standard: Air Quality Index scale as defined by the US-EPA 2016 standard
-	c.JSON(http.StatusOK, `
-		{ 
-			"version": "v1",
-			{
-				"Standard": "Air Quality Index scale as defined by the US-EPA 2016 standard.",
-				"Definitions": [
-					{
-						"AQIServer": "0-50",
-						"Level": "Good",
-						"Implication": "Air quality is considered satisfactory, and air pollution poses little or no risk",
-						"Caution": "None"
-					},
-					{
-						"AQIServer": "51 -100",
-						"Level": "Moderate",
-						"Implication": "Air quality is acceptable; however, for some pollutants there may be a moderate health concern for a very small number of people who are unusually sensitive to air pollution.",
-						"Caution": "Active children and adults, and people with respiratory disease, such as asthma, should limit prolonged outdoor exertion."
-					},
-					{
-						"AQIServer": "101-150",
-						"Level": "Unhealthy for Sensitive Groups",
-						"Implication": "Members of sensitive groups may experience health effects. The general public is not likely to be affected.",
-						"Caution": "Active children and adults, and people with respiratory disease, such as asthma, should limit prolonged outdoor exertion."
-					},
-					{
-						"AQIServer": "151-200",
-						"Level": "Unhealthy",
-						"Implication": "Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects",
-						"Caution": "Active children and adults, and people with respiratory disease, such as asthma, should avoid prolonged outdoor exertion; everyone else, especially children, should limit prolonged outdoor exertion"
-					},
-					{
-						"AQIServer": "201-300",
-						"Level": "Very Unhealthy",
-						"Implication": "Health warnings of emergency conditions. The entire population is more likely to be affected.",
-						"Caution": "Active children and adults, and people with respiratory disease, such as asthma, should avoid all outdoor exertion; everyone else, especially children, should limit outdoor exertion."
-					},
-					{
-						"AQIServer": "300+",
-						"Level": "Hazardous",
-						"Implication": "Health alert: everyone may experience more serious health effects",
-						"Caution": "Everyone should avoid all outdoor exertion"
-					}
-				]
+var done = make(chan bool)
+var ticker = time.NewTicker(5 * time.Second)
+
+func repeat() {
+	for {
+		select {
+		case <-done:
+			fmt.Println("Stop reapted job.")
+			ticker.Stop()
+			return
+		case <-ticker.C:
+			// fmt.Println("Hello !!")
+			resp, _ := http.Get("http://localhost:9011/ping")
+			if resp.StatusCode == http.StatusOK {
+				b, _ := ioutil.ReadAll(resp.Body)
+				fmt.Printf("%s\n", b)
 			}
 		}
-	`)
-
+	}
 }
 
 // main
 func main() {
+
+	// go repeat()
+	// To stop: done <- true
+
 	gin.DisableConsoleColor()
 	server := gin.Default()
 	server.Use(log.Logger_JSON())
 	log.Lx.Fatal(router(context.Background(), server).Run("0.0.0.0:9011"))
+
 }

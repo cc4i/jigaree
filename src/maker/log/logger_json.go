@@ -1,7 +1,7 @@
 // (C)2020 Tuomo Kuure
 // JSON logger middleware for gin-gonic
 
-package logging
+package log
 
 import (
 	"encoding/json"

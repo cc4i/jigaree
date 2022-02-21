@@ -13,3 +13,11 @@ deploy:
     manifests:
     - k8s-manifests/redis/deployment.yaml
     - k8s-manifests/redis/svc.yaml
+
+profiles:
+- name: dev
+  activation:
+    - env: AQI_SERVER_URL="https://api.waqi.info"
+    - env: AQI_SERVER_TOKEN="b0e78ca32d058a9170b6907c5214c0e946534cc9"
+    - env: IP_STACK_SERVER_URL="http://api.ipstack.com"
+    - env: IP_STACK_SERVER_TOKEN="ad7c6834f8dba51e8943d96d3742fcc5"

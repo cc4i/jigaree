@@ -3,7 +3,7 @@ package gen
 import (
 	"fmt"
 	"maker/air"
-	log "maker/logging"
+	"maker/log"
 
 	"github.com/sirupsen/logrus"
 )
