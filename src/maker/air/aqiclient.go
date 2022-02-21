@@ -6,14 +6,17 @@ import (
 	"crypto/tls"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"maker/log"
+	"maker/save"
 
 	"github.com/sirupsen/logrus"
 )
@@ -127,13 +130,12 @@ func init() {
 	IpStackServer = os.Getenv("IP_STACK_SERVER_URL")
 	IpStackServerToken = os.Getenv("IP_STACK_SERVER_TOKEN")
 	if AQIServer == "" || IpStackServer == "" || AQIServerToken == "" || IpStackServerToken == "" {
-		log.Lx.Fatal("Retrieving servers' address were failed. Check out environments setting & Reboot.")
 		log.Lx.WithFields(logrus.Fields{
 			"AQI_SERVER_URL":        AQIServer,
 			"AQI_SERVER_TOKEN":      AQIServerToken,
 			"IP_STACK_SERVER_URL":   IpStackServer,
 			"IP_STACK_SERVER_TOKEN": IpStackServer,
-		}).Error("Failed to initail environments setting, pls configure & Reboot.")
+		}).Fatal("Failed to initail environments setting, pls configure & Reboot.")
 
 	}
 
@@ -233,6 +235,7 @@ func HttpGet(ctx context.Context, url string) ([]byte, error) {
 	return body, nil
 }
 
+// Get city name by IP
 func CityByIP(ctx context.Context, ip string) (string, error) {
 
 	var ipStack IpStack
@@ -253,14 +256,14 @@ func convertAir(content []byte) (AirQuality, error) {
 	var newAir AirQuality
 	var apiError ApiError
 
-	err := json.Unmarshal(content, &originAir)
+	json.Unmarshal(content, &originAir)
 
 	if originAir.Status == "error" {
-		err = json.Unmarshal(content, &apiError)
+		json.Unmarshal(content, &apiError)
 		log.Lx.WithFields(logrus.Fields{
 			"error": apiError,
 		}).Error("return error from AQI service")
-		return newAir, err
+		return newAir, errors.New(apiError.Data)
 
 	}
 	newAir = Copy2AirQuality(originAir)
@@ -269,22 +272,73 @@ func convertAir(content []byte) (AirQuality, error) {
 
 }
 
+// Get air quality by city name
 func AirbyCity(ctx context.Context, city string) (AirQuality, error) {
-
 	url := AQIServer + "/feed/" + city + "/?token=" + AQIServerToken
 	log.Lx.WithFields(logrus.Fields{
 		"url": url,
 	}).Info("request to AQI service")
-	buf, err := HttpGet(ctx, url)
+
+	cache, _ := save.QueryAq4Redis(city)
+	if len(cache) > 0 {
+		aq, _ := convertAir(cache)
+		// not older than 10min
+		fmt.Printf("%s: %d - %d \n", aq.City, (aq.V + 600), int(time.Now().Unix()))
+		if (aq.V + 600) < int(time.Now().Unix()) {
+			buf, err := HttpGet(ctx, url)
+			if err != nil {
+				return AirQuality{}, err
+			}
+			aq, _ := convertAir(buf)
+			log.Lx.WithFields(logrus.Fields{
+				"url": url,
+				"air": aq,
+			}).Info("curated response from AQI service")
+			save.SaveAq2Redis(city, buf)
+			return aq, err
+		}
+		log.Lx.WithFields(logrus.Fields{
+			"air": aq,
+		}).Info("using cached data")
+
+		return aq, nil
+	} else {
+		buf, err := HttpGet(ctx, url)
+		if err != nil {
+			return AirQuality{}, err
+		}
+		aq, _ := convertAir(buf)
+		log.Lx.WithFields(logrus.Fields{
+			"url": url,
+			"air": aq,
+		}).Info("curated response from AQI service")
+		save.SaveAq2Redis(city, buf)
+		return aq, err
+	}
+
+}
+
+// Get air quality by IP
+func AirbyIP(ctx context.Context, ip string) (AirQuality, error) {
+	city, err := CityByIP(ctx, ip)
 	if err != nil {
 		return AirQuality{}, err
 	}
-	air, err := convertAir(buf)
-	log.Lx.WithFields(logrus.Fields{
-		"url": url,
-		"air": air,
-	}).Info("curated response from AQI service")
-	return air, err
+	return AirbyCity(ctx, city)
+
+}
+
+// Get air quality by geograpical information
+func AirbyGeo(ctx context.Context, lat string, lng string) (AirQuality, error) {
+	///air/geo/:lat/:lng ->//feed/geo::lat;:lng/?token=:token
+	//Auckland: -36.916839599609375, 174.70875549316406
+	url := AQIServer + "/feed/geo:" + lat + ";" + lng + "/?token=" + AQIServerToken
+	buf, err := HttpGet(ctx, url)
+	if err != nil {
+		return AirQuality{}, err
+
+	}
+	return convertAir(buf)
 }
 
 // Air Quality Index scale as defined by the US-EPA 2016 standard

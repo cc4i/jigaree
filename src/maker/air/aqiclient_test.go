@@ -28,7 +28,7 @@ func TestHttpGet(t *testing.T) {
 
 		body, err := HttpGet(context.TODO(), ts.URL)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Printf("error: %s\n", err.Error())
 		}
 
 		t.Run(test.name, func(t *testing.T) {
