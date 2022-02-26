@@ -4,8 +4,8 @@ metadata:
   name: jigaree
 build:
   artifacts:
-  - image: us-central1-docker.pkg.dev/play-with-anthos-340801/jigaree/maker
-    context: src/maker
+  - image: us-central1-docker.pkg.dev/play-with-anthos-340801/jigaree/air
+    context: src/air
     buildpacks:
       builder: gcr.io/buildpacks/builder:v1
 deploy:

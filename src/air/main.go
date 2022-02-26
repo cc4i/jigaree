@@ -4,12 +4,12 @@
 package main
 
 import (
+	"air/aqi"
+	"air/gen"
+	"air/log"
 	"context"
 	"fmt"
 	"io/ioutil"
-	"maker/air"
-	"maker/gen"
-	"maker/log"
 	"net/http"
 	"strconv"
 	"time"
@@ -47,7 +47,7 @@ func aqWithRadom(c *gin.Context) {
 func aqByCity(c *gin.Context) {
 
 	city := c.Param("city")
-	bj, err := air.AirbyCity(c.Request.Context(), city)
+	bj, err := aqi.AirbyCity(c.Request.Context(), city)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, bj)
 	} else {
@@ -68,7 +68,7 @@ func metrics(c *gin.Context) {
 
 // Readme for air quality standard
 func readme(c *gin.Context) {
-	c.JSON(http.StatusOK, air.Readme())
+	c.JSON(http.StatusOK, aqi.Readme())
 }
 
 var done = make(chan bool)

@@ -1,4 +1,4 @@
-# maker
+# air
 
 ## Description
 sample description
@@ -6,16 +6,16 @@ sample description
 ## Usage
 
 ### Fetch the package
-`kpt pkg get REPO_URI[.git]/PKG_PATH[@VERSION] maker`
+`kpt pkg get REPO_URI[.git]/PKG_PATH[@VERSION] air`
 Details: https://kpt.dev/reference/cli/pkg/get/
 
 ### View package content
-`kpt pkg tree maker`
+`kpt pkg tree air`
 Details: https://kpt.dev/reference/cli/pkg/tree/
 
 ### Apply the package
 ```
-kpt live init maker
-kpt live apply maker --reconcile-timeout=2m --output=table
+kpt live init air
+kpt live apply air --reconcile-timeout=2m --output=table
 ```
 Details: https://kpt.dev/reference/cli/live/

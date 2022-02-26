@@ -1,9 +1,9 @@
 package gen
 
 import (
+	"air/aqi"
+	"air/log"
 	"fmt"
-	"maker/air"
-	"maker/log"
 	"math/rand"
 	"time"
 
@@ -22,55 +22,55 @@ func cities(n int) [][]string {
 	return cs
 }
 
-func RandomAQ(n int) []air.AirQuality {
-	var rAQ []air.AirQuality
+func RandomAQ(n int) []aqi.AirQuality {
+	var rAQ []aqi.AirQuality
 	cs := cities(n)
 	for _, c := range cs {
-		originAirQuality := air.OriginAirQuality{
+		originAirQuality := aqi.OriginAirQuality{
 			Status: "ok",
-			Data: air.OriginData{
+			Data: aqi.OriginData{
 				AQI:          63,
 				StationIndex: rand.Intn(9999),
-				City: air.OriginCity{
+				City: aqi.OriginCity{
 					Geo: []float64{
 						39.954592,
 						116.468117,
 					},
 					Name: fmt.Sprintf("%s (%s)", c[0], c[1]),
 				},
-				IAQI: air.OriginIAQI{
-					Co: air.OValue{
+				IAQI: aqi.OriginIAQI{
+					Co: aqi.OValue{
 						V: rand.Float64(),
 					},
-					H: air.OValue{
+					H: aqi.OValue{
 						V: rand.Float64(),
 					},
-					No2: air.OValue{
+					No2: aqi.OValue{
 						V: rand.Float64(),
 					},
-					O3: air.OValue{
+					O3: aqi.OValue{
 						V: rand.Float64(),
 					},
-					P: air.OValue{
+					P: aqi.OValue{
 						V: rand.Float64(),
 					},
-					Pm10: air.OValue{
+					Pm10: aqi.OValue{
 						V: rand.Float64(),
 					},
-					Pm25: air.OValue{
+					Pm25: aqi.OValue{
 						V: rand.Float64(),
 					},
-					So2: air.OValue{
+					So2: aqi.OValue{
 						V: rand.Float64(),
 					},
-					T: air.OValue{
+					T: aqi.OValue{
 						V: rand.Float64(),
 					},
-					W: air.OValue{
+					W: aqi.OValue{
 						V: 3.6,
 					},
 				},
-				OriginTime: air.OriginTime{
+				OriginTime: aqi.OriginTime{
 					S:  "2099-09-09 09:00:00",
 					TZ: "+08:00",
 					V:  int(time.Now().Unix()),
@@ -80,7 +80,7 @@ func RandomAQ(n int) []air.AirQuality {
 		log.Lx.WithFields(logrus.Fields{
 			"air": originAirQuality,
 		}).Info("original air quality data")
-		oa := air.Copy2AirQuality(originAirQuality)
+		oa := aqi.Copy2AirQuality(originAirQuality)
 		log.Lx.WithFields(logrus.Fields{
 			"new_air": oa,
 		}).Info("coverted air quality data")

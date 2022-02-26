@@ -1,4 +1,4 @@
-package air
+package aqi
 
 import (
 	"context"

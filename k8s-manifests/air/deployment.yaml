@@ -14,8 +14,8 @@ spec:
     spec:
       terminationGracePeriodSeconds: 5
       containers:
-      - name: maker
-        image:  maker
+      - name: air
+        image:  air
         env:
           - name: AQI_SERVER_URL
             valueFrom: 

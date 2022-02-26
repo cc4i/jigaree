@@ -15,35 +15,42 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Jigree for Fun',
       home: Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.menu_book),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.coffee_maker),
+            onPressed: () {},
+          ),
+          title: const Text(
+            "City Environment & Sustainability",
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              fontSize: 26,
+              fontStyle: FontStyle.italic,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.fiber_dvr),
               onPressed: () {},
             ),
-            title: const Text(
-              "City Environment & Sustainability",
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                fontSize: 26,
-                fontStyle: FontStyle.italic,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+          ],
+        ),
+        body: ListView(
+          children: [
+            MyHomePage(
+              title: "page",
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.alarm_on_outlined),
-                onPressed: () {},
-              ),
-            ],
-          ),
-          body: ListView(
-            children: [
-              MyHomePage(
-                title: "page",
-              ),
-            ],
-          )),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.computer),
+          foregroundColor: Colors.white70,
+          backgroundColor: Colors.blueAccent,
+          onPressed: () {},
+        ),
+      ),
     );
   }
 }

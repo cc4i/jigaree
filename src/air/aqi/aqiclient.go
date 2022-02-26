@@ -1,4 +1,4 @@
-package air
+package aqi
 
 import (
 	"context"
@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"maker/log"
-	"maker/save"
+	"air/log"
+	"air/save"
 
 	"github.com/sirupsen/logrus"
 )

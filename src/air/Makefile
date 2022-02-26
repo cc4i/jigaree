@@ -15,6 +15,7 @@ test:	fmt	vet
 	IP_STACK_SERVER_URL="https://127.0.0.1" \
 	IP_STACK_SERVER_TOKEN="1234567890" \
 	AIR_VERSION="v1" \
+	REDIS_SERVER_ADDRESS="127.0.0.1:6379" \
 	go test ./... -v -cover
 
 
