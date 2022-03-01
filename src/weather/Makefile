@@ -1,6 +1,6 @@
 
 # Image URL to use all building/pushing
-DOCKER_IMAGE ?= air
+DOCKER_IMAGE ?= weather
 DOCKER_TAG ?= $(shell git rev-parse --abbrev-ref HEAD)
 # Docker Hub username / password
 DOCKER_PASS =
@@ -9,21 +9,21 @@ DOCKER_USER =
 
 all:	manager
 
-test:	fmt	vet
-	AQI_SERVER_URL="https://127.0.0.1" \
-	AQI_SERVER_TOKEN="1234567890" \
-	IP_STACK_SERVER_URL="https://127.0.0.1" \
-	IP_STACK_SERVER_TOKEN="1234567890" \
-	AIR_VERSION="v1" \
-	REDIS_SERVER_ADDRESS="127.0.0.1:6379" \
+# Compile protos
+pb:
+	protoc -I=../../pb --go_out=. \
+		--go-grpc_out=. \
+		../../pb/weather.proto
+
+test:	fmt	vet pb
 	go test ./... -v -cover
 
 
 # Build manager binary
-manager:	fmt	vet
-	go build -o air main.go
+manager:	fmt	vet pb
+	go build -o weather main.go
 
-run:	fmt	vet
+run:	fmt	vet pb
 	go run ./main.go
 
 # Run go fmt against code

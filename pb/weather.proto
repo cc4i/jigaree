@@ -2,32 +2,88 @@ syntax = "proto3";
 
 package weather;
 
+option go_package = "/protos";
+
+
 // Interface exported by Weather Server.
 service WeatherService {
-    // Retrieve air qualiy by city.
-    rpc AirQualitybyCity(string) returns (CityAirQuality) {}
+    // Retrieve weather by city name.
+    rpc WeatherbyCity(CityWeatherRequest) returns (CityWeatherResponse) {}
 
-    // Retrieve air quality by IP, where IP is belonging to.
-    rpc AirQualitybyIP(string) returns (CityAirQuality) {}
 }
 
-// The air quality data for city.
-message CityAirQuality {
-
-    // The name of city
+message CityWeatherRequest {
     string city = 1;
-
-    string co = 2;
-	string h = 3;
-	string no2 = 4;
-	string o3 = 5;
-	string p = 6;
-	string pm10 = 7;
-	string pm25 = 8;
-	string so2 = 9;
-
-    // Latitude
-    string lat = 10;
-    // Longitude
-	string lgt = 11;
 }
+
+
+// The weather.
+message CityWeatherResponse {
+
+    string city = 1;
+    string region = 2;
+    string country = 3;
+    string tz = 4;
+    int32 localtime = 5;
+    int32 lastUpdate = 6;
+    string conditionText = 7;
+    string conditionIcon = 8;
+
+    float windKph = 10;
+    float windDegree = 11;
+    string windDir = 12;
+    float pressureMb = 13;
+    float pressureIn = 14;
+    float precipMm = 15;
+    float precipIn = 16;
+    float humidity = 17;
+    float cloud = 18;
+    float feelslikeC = 19;
+    float visKm = 21;
+    float uv = 23;
+    float gustKph = 24;
+}
+
+/**
+{
+    "location": {
+        "name": "Chengdu",
+        "region": "Sichuan",
+        "country": "China",
+        "lat": 30.67,
+        "lon": 104.07,
+        "tz_id": "Asia/Shanghai",
+        "localtime_epoch": 1646104682,
+        "localtime": "2022-03-01 11:18"
+    },
+    "current": {
+        "last_updated_epoch": 1646104500,
+        "last_updated": "2022-03-01 11:15",
+        "temp_c": 12.0,
+        "temp_f": 53.6,
+        "is_day": 1,
+        "condition": {
+            "text": "Partly cloudy",
+            "icon": "//cdn.weatherapi.com/weather/64x64/day/116.png",
+            "code": 1003
+        },
+        "wind_mph": 6.9,
+        "wind_kph": 11.2,
+        "wind_degree": 250,
+        "wind_dir": "WSW",
+        "pressure_mb": 1026.0,
+        "pressure_in": 30.3,
+        "precip_mm": 0.0,
+        "precip_in": 0.0,
+        "humidity": 67,
+        "cloud": 25,
+        "feelslike_c": 11.0,
+        "feelslike_f": 51.7,
+        "vis_km": 10.0,
+        "vis_miles": 6.0,
+        "uv": 4.0,
+        "gust_mph": 7.6,
+        "gust_kph": 12.2
+    }
+}
+**/
