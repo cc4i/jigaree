@@ -284,37 +284,22 @@ func AirbyCity(ctx context.Context, city string) (AirQuality, error) {
 		aq, _ := convertAir(cache)
 		// not older than 10min
 		fmt.Printf("%s: %d - %d \n", aq.City, (aq.V + 600), int(time.Now().Unix()))
-		if (aq.V + 600) < int(time.Now().Unix()) {
-			buf, err := HttpGet(ctx, url)
-			if err != nil {
-				return AirQuality{}, err
-			}
-			aq, _ := convertAir(buf)
-			log.Lx.WithFields(logrus.Fields{
-				"url": url,
-				"air": aq,
-			}).Info("curated response from AQI service")
-			save.SaveAq2Redis(city, buf)
-			return aq, err
+		if (aq.V + 600) > int(time.Now().Unix()) {
+			return aq, nil
 		}
-		log.Lx.WithFields(logrus.Fields{
-			"air": aq,
-		}).Info("using cached data")
-
-		return aq, nil
-	} else {
-		buf, err := HttpGet(ctx, url)
-		if err != nil {
-			return AirQuality{}, err
-		}
-		aq, _ := convertAir(buf)
-		log.Lx.WithFields(logrus.Fields{
-			"url": url,
-			"air": aq,
-		}).Info("curated response from AQI service")
-		save.SaveAq2Redis(city, buf)
-		return aq, err
 	}
+
+	buf, err := HttpGet(ctx, url)
+	if err != nil {
+		return AirQuality{}, err
+	}
+	aq, _ := convertAir(buf)
+	log.Lx.WithFields(logrus.Fields{
+		"url": url,
+		"air": aq,
+	}).Info("curated response from AQI service")
+	save.SaveAq2Redis(city, buf)
+	return aq, err
 
 }
 

@@ -24,24 +24,24 @@ message CityWeatherResponse {
     string region = 2;
     string country = 3;
     string tz = 4;
-    int32 localtime = 5;
-    int32 lastUpdate = 6;
+    int64 localtime = 5;
+    int64 lastUpdate = 6;
     string conditionText = 7;
     string conditionIcon = 8;
 
-    float windKph = 10;
-    float windDegree = 11;
+    double windKph = 10;
+    double windDegree = 11;
     string windDir = 12;
-    float pressureMb = 13;
-    float pressureIn = 14;
-    float precipMm = 15;
-    float precipIn = 16;
-    float humidity = 17;
-    float cloud = 18;
-    float feelslikeC = 19;
-    float visKm = 21;
-    float uv = 23;
-    float gustKph = 24;
+    double pressureMb = 13;
+    double pressureIn = 14;
+    double precipMm = 15;
+    double precipIn = 16;
+    double humidity = 17;
+    double cloud = 18;
+    double feelslikeC = 19;
+    double visKm = 21;
+    double uv = 23;
+    double gustKph = 24;
 }
 
 /**
