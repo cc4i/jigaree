@@ -23,7 +23,7 @@ type WeatheService struct {
 	pb.UnimplementedWeatherServiceServer
 }
 
-// https://www.weatherapi.com/ - chuancc+weatherapi@gmail.com
+// https://api.weatherapi.com/ - chuancc+weatherapi@gmail.com
 func init() {
 	WeatherServer = os.Getenv("WEATHER_SERVER_URL")
 	WeatherServerToken = os.Getenv("WEATHER_SERVER_TOKEN")
@@ -44,7 +44,7 @@ func (s *WeatheService) WeatherbyCity(ctx context.Context, in *pb.CityWeatherReq
 		}
 	}
 
-	url := fmt.Sprintf("https://%s/v1/current.json?key=%s&q=%s&aqi=no", WeatherServer, WeatherServerToken, in.City)
+	url := fmt.Sprintf("%s/v1/current.json?key=%s&q=%s&aqi=no", WeatherServer, WeatherServerToken, in.City)
 	log.Printf("Call url => %s\n", url)
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	resp, err := http.Get(url)

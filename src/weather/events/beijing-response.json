@@ -1,0 +1,41 @@
+{
+    "location": {
+        "name": "Beijing",
+        "region": "Beijing",
+        "country": "China",
+        "lat": 39.93,
+        "lon": 116.39,
+        "tz_id": "Asia/Shanghai",
+        "localtime_epoch": 1646296476,
+        "localtime": "2022-03-03 16:34"
+    },
+    "current": {
+        "last_updated_epoch": 1646296200,
+        "last_updated": "2022-03-03 16:30",
+        "temp_c": 11.0,
+        "temp_f": 51.8,
+        "is_day": 1,
+        "condition": {
+            "text": "Sunny",
+            "icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
+            "code": 1000
+        },
+        "wind_mph": 6.9,
+        "wind_kph": 11.2,
+        "wind_degree": 150,
+        "wind_dir": "SSE",
+        "pressure_mb": 1011.0,
+        "pressure_in": 29.85,
+        "precip_mm": 0.0,
+        "precip_in": 0.0,
+        "humidity": 20,
+        "cloud": 0,
+        "feelslike_c": 11.0,
+        "feelslike_f": 51.8,
+        "vis_km": 10.0,
+        "vis_miles": 6.0,
+        "uv": 4.0,
+        "gust_mph": 2.0,
+        "gust_kph": 3.2
+    }
+}
