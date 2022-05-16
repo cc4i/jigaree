@@ -15,9 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"air/log"
 	"air/save"
 
+	"github.com/rs/zerolog/log"
 	"github.com/sirupsen/logrus"
 )
 
@@ -130,12 +130,10 @@ func init() {
 	IpStackServer = os.Getenv("IP_STACK_SERVER_URL")
 	IpStackServerToken = os.Getenv("IP_STACK_SERVER_TOKEN")
 	if AQIServer == "" || IpStackServer == "" || AQIServerToken == "" || IpStackServerToken == "" {
-		log.Lx.WithFields(logrus.Fields{
-			"AQI_SERVER_URL":        AQIServer,
-			"AQI_SERVER_TOKEN":      AQIServerToken,
-			"IP_STACK_SERVER_URL":   IpStackServer,
-			"IP_STACK_SERVER_TOKEN": IpStackServer,
-		}).Fatal("Failed to initail environments setting, pls configure & Reboot.")
+		log.Fatal().Str("AQI_SERVER_URL", AQIServer).Str("AQI_SERVER_TOKEN", AQIServerToken).
+			Str("IP_STACK_SERVER_URL", IpStackServer).
+			Str("IP_STACK_SERVER_TOKEN", IpStackServer).
+			Msg("Failed to initail environments setting, pls configure & Reboot.")
 
 	}
 

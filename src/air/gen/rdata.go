@@ -2,12 +2,11 @@ package gen
 
 import (
 	"air/aqi"
-	"air/log"
 	"fmt"
 	"math/rand"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 func cities(n int) [][]string {
@@ -77,13 +76,9 @@ func RandomAQ(n int) []aqi.AirQuality {
 				},
 			},
 		}
-		log.Lx.WithFields(logrus.Fields{
-			"air": originAirQuality,
-		}).Info("original air quality data")
+		log.Info().Interface("air", originAirQuality).Msg("original air quality data")
 		oa := aqi.Copy2AirQuality(originAirQuality)
-		log.Lx.WithFields(logrus.Fields{
-			"new_air": oa,
-		}).Info("coverted air quality data")
+		log.Info().Interface("new_air", oa).Msg("coverted air quality data")
 		rAQ = append(rAQ, oa)
 	}
 

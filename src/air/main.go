@@ -6,7 +6,6 @@ package main
 import (
 	"air/aqi"
 	"air/gen"
-	"air/log"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -16,7 +15,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // Configurue routes
@@ -33,9 +33,7 @@ func router(ctx context.Context, r *gin.Engine) *gin.Engine {
 
 func aqWithRadom(c *gin.Context) {
 	n, err := strconv.Atoi(c.Param("num"))
-	log.Lx.WithFields(logrus.Fields{
-		"num": n,
-	}).Info("ask for random data")
+	log.Info().Int("num", n).Msg("ask for random data")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 	} else {
@@ -94,23 +92,28 @@ func repeat() {
 func pHeaders() gin.HandlerFunc {
 	//
 	return func(c *gin.Context) {
-		log.Lx.WithFields(logrus.Fields{
-			"headers": c.Request.Header,
-		}).Info("request headers")
+		log.Info().Fields(c.Request.Header).Msg("request headers")
+
 	}
 
 }
 
 // main
+// default envrionments
+// export REDIS_SERVER_ADDRESS="127.0.0.1:6379"
+// export AQI_SERVER_URL="https://api.waqi.info"
+// export AQI_SERVER_TOKEN="b0e78ca32d058a9170b6907c5214c0e946534cc9"
+// export IP_STACK_SERVER_URL="http://api.ipstack.com"
+// export IP_STACK_SERVER_TOKEN="ad7c6834f8dba51e8943d96d3742fcc5"
 func main() {
-
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	// go repeat()
 	// To stop: done <- true
 
 	gin.DisableConsoleColor()
 	server := gin.Default()
-	server.Use(log.Logger_JSON())
+	// server.Use(log.Logger_JSON())
 	server.Use(pHeaders())
-	log.Lx.Fatal(router(context.Background(), server).Run("0.0.0.0:9011"))
+	log.Fatal().Err(router(context.Background(), server).Run("0.0.0.0:9011"))
 
 }
