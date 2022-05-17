@@ -1,12 +1,11 @@
 package save
 
 import (
-	"air/log"
 	"context"
 	"os"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -19,9 +18,8 @@ func init() {
 	RedisServer = os.Getenv("REDIS_SERVER_ADDRESS")
 	RedisServerPassword = os.Getenv("REDIS_SERVER_PASSWORD")
 	if RedisServer == "" {
-		log.Lx.WithFields(logrus.Fields{
-			"REDIS_SERVER_ADDRESS": RedisServer,
-		}).Fatal("Failed to initail environments setting, pls configure & Reboot.")
+		log.Fatal().Str("REDIS_SERVER_ADDRESS", RedisServer).
+			Msg("Failed to initail environments setting, pls configure & Reboot.")
 
 	} else {
 		RedisClient = redis.NewClient(&redis.Options{
@@ -30,10 +28,7 @@ func init() {
 		})
 		pong, err := RedisClient.Ping(context.TODO()).Result()
 		if err != nil {
-			log.Lx.WithFields(logrus.Fields{
-				"to":     RedisServer,
-				"result": pong,
-			}).Fatal("Failed to connect Redis.")
+			log.Fatal().Str("to", RedisServer).Str("result", pong).Msg("Failed to connect Redis.")
 
 		}
 	}
@@ -47,10 +42,7 @@ func SaveAq2Redis(city string, buf []byte) error {
 	cmds, err := pipeline.Exec(ctx)
 
 	for _, cmd := range cmds {
-		log.Lx.WithFields(logrus.Fields{
-			"args": cmd.Args(),
-			"name": cmd.FullName(),
-		}).Debug("Execute Redis' cmd")
+		log.Fatal().Interface("args", cmd.Args()).Str("name", cmd.FullName()).Msg("Execute Redis' cmd")
 	}
 
 	return err

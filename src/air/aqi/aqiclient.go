@@ -18,7 +18,6 @@ import (
 	"air/save"
 
 	"github.com/rs/zerolog/log"
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -149,9 +148,7 @@ func init() {
 func SplitName(name string) (city string, citycn string) {
 	ns := strings.Split(name, "(")
 	if len(ns) != 2 {
-		log.Lx.WithFields(logrus.Fields{
-			"name": name,
-		}).Error("Input name wasn't matched with convention. eg: ", "Beijing (北京)")
+		log.Error().Str("name", name).Msg("Input name wasn't matched with convention. eg: Beijing (北京)")
 
 		return name, ""
 	}
@@ -197,39 +194,28 @@ func Copy2AirQuality(src OriginAirQuality) AirQuality {
 
 func HttpGet(ctx context.Context, url string) ([]byte, error) {
 
-	log.Lx.WithFields(logrus.Fields{
-		"url": url,
-	}).Info("request to")
+	log.Info().Str("url", url).Msg("request to")
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Lx.WithFields(logrus.Fields{
-			"url":   url,
-			"error": err,
-		}).Error("Http.NewRequest() was failed")
+		log.Error().Str("url", url).
+			Interface("error", err).Msg("Http.NewRequest() was failed")
 		return nil, err
 	}
 	resp, err := Client.Do(req)
 	if err != nil {
-		log.Lx.WithFields(logrus.Fields{
-			"url":   url,
-			"error": err,
-		}).Error("Client.Do() was failed")
+		log.Error().Str("url", url).
+			Interface("error", err).Msg("Client.Do() was failed")
 		return nil, err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Lx.WithFields(logrus.Fields{
-			"url":   url,
-			"error": err,
-		}).Error("Failed to read buffer")
+		log.Error().Str("url", url).
+			Interface("error", err).Msg("Failed to read buffer")
 		return nil, err
 	}
 
-	log.Lx.WithFields(logrus.Fields{
-		"url":  url,
-		"byte": body,
-	}).Debug("response from http server")
+	log.Debug().Str("url", url).Bytes("byte", body).Msg("response from http server")
 	return body, nil
 }
 
@@ -258,9 +244,7 @@ func convertAir(content []byte) (AirQuality, error) {
 
 	if originAir.Status == "error" {
 		json.Unmarshal(content, &apiError)
-		log.Lx.WithFields(logrus.Fields{
-			"error": apiError,
-		}).Error("return error from AQI service")
+		log.Error().Interface("error", apiError).Msg("return error from AQI service")
 		return newAir, errors.New(apiError.Data)
 
 	}
@@ -273,9 +257,7 @@ func convertAir(content []byte) (AirQuality, error) {
 // Get air quality by city name
 func AirbyCity(ctx context.Context, city string) (AirQuality, error) {
 	url := AQIServer + "/feed/" + city + "/?token=" + AQIServerToken
-	log.Lx.WithFields(logrus.Fields{
-		"url": url,
-	}).Info("request to AQI service")
+	log.Info().Str("url", url).Msg("request to AQI service")
 
 	cache, _ := save.QueryAq4Redis(city)
 	if len(cache) > 0 {
@@ -292,10 +274,7 @@ func AirbyCity(ctx context.Context, city string) (AirQuality, error) {
 		return AirQuality{}, err
 	}
 	aq, _ := convertAir(buf)
-	log.Lx.WithFields(logrus.Fields{
-		"url": url,
-		"air": aq,
-	}).Info("curated response from AQI service")
+	log.Info().Str("url", url).Interface("air", aq).Msg("curated response from AQI service")
 	save.SaveAq2Redis(city, buf)
 	return aq, err
 
