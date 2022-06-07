@@ -2,23 +2,22 @@ package main
 
 import (
 	"context"
-	"gate/log"
 	"net/http"
 
 	docs "gate/docs"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func pHeaders() gin.HandlerFunc {
-	//
+
 	return func(c *gin.Context) {
-		log.Lx.WithFields(logrus.Fields{
-			"headers": c.Request.Header,
-		}).Info("request headers")
+		log.Info().Fields(c.Request.Header).Msg("request headers")
+
 	}
 
 }
@@ -53,12 +52,10 @@ func router(ctx context.Context, r *gin.Engine) *gin.Engine {
 
 func main() {
 
-	// go repeat()
-	// To stop: done <- true
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
 	gin.DisableConsoleColor()
 	server := gin.Default()
-	server.Use(log.Logger_JSON())
 	server.Use(pHeaders())
-	log.Lx.Fatal(router(context.Background(), server).Run("0.0.0.0:9000"))
+	log.Fatal().Err(router(context.Background(), server).Run("0.0.0.0:9000"))
 }
