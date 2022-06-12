@@ -1,0 +1,35 @@
+steps:
+  # Provision clusters if need to
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: build-applications
+    entrypoint: 'bash'
+    args:
+    - '-eEuo'
+    - 'pipefail'
+    - '-c'
+    - |-
+      cd demo && skaffold build -f=skaffold.yaml
+
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: provison-redis
+    entrypoint: 'bash'
+    args:
+    - '-eEuo'
+    - 'pipefail'
+    - '-c'
+    - |-
+      export region=${_CUSTOM_REGION}
+      export redis_instance_name=${_REDIS_INSTANCE_NAME}
+      cd hack && ./redis.sh ${region} ${redis_instance_name}
+
+
+timeout: 7200s
+substitutions:
+    _CUSTOM_REGION: asia-east2
+    _VPC_NETWORK: custom-vpc-1
+    _REDIS_INSTANCE_NAME: redis4cart
+    _SERVERLESS_CONNECTOR: vpc-connector-cloudrun
+options:
+  dynamicSubstitutions: true
+  substitution_option: 'ALLOW_LOOSE'
