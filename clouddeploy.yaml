@@ -1,0 +1,18 @@
+apiVersion: deploy.cloud.google.com/v1beta1
+kind: DeliveryPipeline
+metadata:
+  name: gdt-app-master
+description: gdt delivery pipeline for master.
+serialPipeline:
+ stages:
+ - targetId: asia-northeast1
+
+
+---
+apiVersion: deploy.cloud.google.com/v1beta1
+kind: Target
+metadata:
+  name: asia-northeast1
+description: asia-northeast1 cluster
+gke:
+  cluster: projects/${PROJECT_ID}/locations/asia-northeast1/clusters/gke-auto-asia-northeast1

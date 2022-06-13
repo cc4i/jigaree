@@ -12,10 +12,21 @@ Jigaree is microservices based application and running on Kubernetes, as an exam
 ### Cloud Build & Cloud Deploy
 
 ```bash
+source ../hack/example-env.sh
 
-git clone git@github.com:cc4i/jigaree.git
-cd jigaree
+# Create building pipeline
 gcloud builds submit --config=cloudbuild.yaml --async
+
+# Create deployment pipeline
+gcloud deploy apply --file=clouddeploy.yaml --region=${REGION} --project=${PROJECT_ID} --async
+
+# Create trigger for CI/CD
+gcloud beta builds triggers create cloud-source-repositories \
+    --repo=REPO_NAME \
+    --branch-pattern=BRANCH_PATTERN \ # or --tag-pattern=TAG_PATTERN
+    --build-config=BUILD_CONFIG_FILE \
+    --service-account=SERVICE_ACCOUNT \
+    --require-approval
 
 ```
 ### Tekton & ArgoCD
@@ -25,16 +36,10 @@ gcloud builds submit --config=cloudbuild.yaml --async
 ### GKE
 
 ```bash
-
-# Project ID to host your cluster
-export PROJECT_ID=play-with-anthos-340801
-# Which region to place your cluster
-export LOCATION=asia-east2-b
-# Cluster name of your GKE
-export CLUSTER=jigaree-k8s-cluster
+source ../hack/example-env.sh
 
 gcloud container --project ${PROJECT_ID} clusters create ${CLUSTER} \
-    --zone ${LOCATION} \
+    --zone ${ZONE} \
     --no-enable-basic-auth \
     --machine-type "n2d-standard-2" \
     --scopes "https://www.googleapis.com/auth/cloud-platform" \
@@ -42,8 +47,7 @@ gcloud container --project ${PROJECT_ID} clusters create ${CLUSTER} \
     --enable-ip-alias \
     --enable-dataplane-v2 \
     --workload-pool "${PROJECT_ID}.svc.id.goog" \
-    --node-locations ${LOCATION}
-
+    --node-locations ${ZONE}
 
 ```
 
