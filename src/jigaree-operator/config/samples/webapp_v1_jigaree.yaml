@@ -1,0 +1,6 @@
+apiVersion: webapp.cc4i.xyz/v1
+kind: Jigaree
+metadata:
+  name: jigaree-sample
+spec:
+  # TODO(user): Add fields here

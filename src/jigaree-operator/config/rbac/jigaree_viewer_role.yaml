@@ -1,0 +1,20 @@
+# permissions for end users to view jigarees.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jigaree-viewer-role
+rules:
+- apiGroups:
+  - webapp.cc4i.xyz
+  resources:
+  - jigarees
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - webapp.cc4i.xyz
+  resources:
+  - jigarees/status
+  verbs:
+  - get

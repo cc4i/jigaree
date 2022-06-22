@@ -1,0 +1,16 @@
+domain: cc4i.xyz
+layout:
+- go.kubebuilder.io/v3
+projectName: jigaree-operator
+repo: jigaree-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: cc4i.xyz
+  group: webapp
+  kind: Jigaree
+  path: jigaree-operator/api/v1
+  version: v1
+version: "3"
