@@ -23,7 +23,7 @@ type WeatheService struct {
 	pb.UnimplementedWeatherServiceServer
 }
 
-// https://api.weatherapi.com/ - chuancc+weatherapi@gmail.com
+// https://api.weatherapi.com - cac91acc69cd413d8c881355220303
 func init() {
 	WeatherServer = os.Getenv("WEATHER_SERVER_URL")
 	WeatherServerToken = os.Getenv("WEATHER_SERVER_TOKEN")
