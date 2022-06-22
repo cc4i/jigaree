@@ -3,8 +3,6 @@ module weather
 go 1.17
 
 require (
-	github.com/genuinetools/weather v0.15.7
-	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
 )
