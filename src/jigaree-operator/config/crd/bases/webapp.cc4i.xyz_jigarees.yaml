@@ -35,10 +35,31 @@ spec:
           spec:
             description: JigareeSpec defines the desired state of Jigaree
             properties:
-              foo:
-                description: Foo is an example field of Jigaree. Edit jigaree_types.go
-                  to remove/update
-                type: string
+              air:
+                properties:
+                  replicaNumber:
+                    type: string
+                type: object
+              gate:
+                properties:
+                  replicaNumber:
+                    type: string
+                type: object
+              weather:
+                properties:
+                  replicaNumber:
+                    type: string
+                type: object
+              website:
+                properties:
+                  replicaNumber:
+                    type: string
+                type: object
+            required:
+            - air
+            - gate
+            - weather
+            - website
             type: object
           status:
             description: JigareeStatus defines the observed state of Jigaree

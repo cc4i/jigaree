@@ -25,11 +25,26 @@ import (
 
 // JigareeSpec defines the desired state of Jigaree
 type JigareeSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Air     AirSpec     `json:"air"`
+	Gate    GateSpec    `json:"gate"`
+	Website WebsiteSpec `json:"website"`
+	Weather WeatherSpec `json:"weather"`
+}
 
-	// Foo is an example field of Jigaree. Edit jigaree_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+type GateSpec struct {
+	ReplicaNum string `json:"replicaNumber,omitempty"`
+}
+
+type WebsiteSpec struct {
+	ReplicaNum string `json:"replicaNumber,omitempty"`
+}
+
+type WeatherSpec struct {
+	ReplicaNum string `json:"replicaNumber,omitempty"`
+}
+
+type AirSpec struct {
+	ReplicaNum string `json:"replicaNumber,omitempty"`
 }
 
 // JigareeStatus defines the observed state of Jigaree
