@@ -1,0 +1,21 @@
+.main-table {
+    width: 100%;
+    padding-top: 100px;
+}
+
+.mat-radio-button ~ .mat-radio-button {
+    margin-left: 16px;
+  }
+
+.city-form-field {
+    width: 400px;
+  }
+
+.full-width {
+    width: 100%;
+  }
+
+.mat-grid-tile .mat-figure {
+    justify-content: flex-start !important ;
+    align-items: flex-start !important;
+}

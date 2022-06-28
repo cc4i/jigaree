@@ -315,14 +315,88 @@
     </g>
   </svg>
   <span>
-    <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jigaree</h2>
+    <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{title}}</h2>
   </span>
   <div class="spacer"> </div>
-
 </div>
 
-<div class="content" role="main">
+<div class="main-table" role="main">
+    <mat-grid-list cols="2" rowHeight="100px">
+      <mat-grid-tile colspan="2" rowspan="1">
+        <div style="width: 100%; display: flex; align-items: flex-start; padding: 20px;">
+          <mat-form-field class="city-form-field" appearance="fill">
+            <mat-label>City</mat-label>
+            <input matInput type="text" [(ngModel)]="cityDesc">
+            <button *ngIf="cityDesc" matSuffix mat-icon-button aria-label="Clear" (click)="cityDesc=''">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+          <div style="width: 100%; display: flex; align-items: flex-start; padding: 20px;">
+            <label>Protocols: </label>
+            <mat-radio-group aria-label="Select an option">
+              <mat-radio-button value="1">TCP</mat-radio-button>
+              <mat-radio-button value="2">HTTP/s</mat-radio-button>
+              <mat-radio-button value="3">gRPC</mat-radio-button>
+              <mat-radio-button value="4">GraphQL</mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="1" rowspan="1" style="background: rgb(223, 206, 234);">
+        <div style="width: 100%; padding: 20px; margin: auto;">
+          <mat-form-field class="full-width" appearance="fill">
+            <mat-label>Request</mat-label>
+            <textarea matInput placeholder="Ex. It makes me feel..."></textarea>
+          </mat-form-field>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="1" rowspan="1" style="background: lightblue">
+        <div style="width: 100%; padding: 20px; margin: auto;">
+          <mat-form-field class="full-width" appearance="fill">
+            <mat-label>Response</mat-label>
+            <textarea matInput placeholder="Ex. It makes me feel..."></textarea>
+          </mat-form-field>
+        </div>
+      </mat-grid-tile>
 
+    </mat-grid-list>
+</div>
+
+<div style="margin: auto; width:100%; padding: 20px">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%;">
+
+    <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+  
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+    </ng-container>
+  
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+  
+    <!-- Weight Column -->
+    <ng-container matColumnDef="weight">
+      <th mat-header-cell *matHeaderCellDef> Weight </th>
+      <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
+    </ng-container>
+  
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="symbol">
+      <th mat-header-cell *matHeaderCellDef> Symbol </th>
+      <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
+    </ng-container>
+  
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>          
+</div>
+<div class="content" role="footer">
   <!-- Footer -->
   <footer>
       Love the app?&nbsp;
