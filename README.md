@@ -51,9 +51,10 @@ gcloud container --project ${PROJECT_ID} clusters create ${CLUSTER} \
 
 ```
 
-### GKE
 
 ### K83
+
+## Operator for Applications
 
 ## Service Mesh
 
